@@ -1,0 +1,21 @@
+========================================================================
+| In order to compile nauty on systems which include a Unix-like shell
+| (which includes MacOSX and Cygwin), you must first run the script
+| "configure".  Usually this can be done with the command
+|  ./configure
+| 
+| The configure script will create custom versions of these files:
+|   gtools.h makefile naututil.h nauty.h
+| Afterwards you can use "make" to compile everything.
+| 
+| In case you can't run shell scripts, or configure doesn't work for 
+| some reason, you need to adjust the configuration by hand:
+| For gtools.h, naututil.h, and nauty.h, make sure definitions near the
+| start of the file (like HAVE_UNISTD_H and SIZEOF_INT) are all correct.
+| For makefile, copy the file makefile.basic to makefile, then check the
+| definitions near the start.
+| 
+| Please notify Brendan McKay <bdm@cs.anu.edu.au> of any problems with
+| the configuration and of any hints you might have for other people with
+| similar setups as you have.
+========================================================================

@@ -1,0 +1,24 @@
+1-12:2 
+ 1 cell; code = 3; cpu time = 0.0000000 seconds
+unit partition
+(2 12)(3 11)(4 10)(5 9)(6 8)
+level 2:  7 orbits; 5 fixed; index 2
+(1 2 3 4 5 6 7 8 9 10 11 12)
+level 1:  1 orbit; 1 fixed; index 12
+1 orbit; grpsize=24; 2 gens; 6 nodes; maxlev=3
+cpu time = 0.00 seconds
+(2 12)(3 11)(4 10)(5 9)(6 8)
+level 2:  7 orbits; 5 fixed; index 2
+(1 2 3 4 5 6 7 8 9 10 11 12)
+level 1:  1 orbit; 1 fixed; index 12
+1 orbit; grpsize=24; 2 gens; 6 nodes; maxlev=3
+canupdates=1; cpu time = 0.00 seconds
+[S694e3b60 2ef1aacb 10268774]
+(2 8)(3 9)(4 5)(6 7)(10 11)
+level 2:  7 orbits; 2 fixed; index 2
+(1 2)(3 6)(4 12)(7 11)(9 10)
+(1 3)(2 7)(4 6)(5 9)(8 10)(11 12)
+level 1:  1 orbit; 1 fixed; index 12
+1 orbit; grpsize=24; 3 gens; 8 nodes; maxlev=3
+canupdates=1; cpu time = 0.00 seconds
+[S694e3b60 2ef1aacb 10268774]

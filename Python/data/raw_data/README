@@ -1,0 +1,3 @@
+=== ABOUT ===
+
+This folder contains the raw network data. For txt files, every row represents two vertices that form a link.

@@ -1,0 +1,4 @@
+#  This is a dummy file to keep autoconf happy
+#  Since we don't provide an "install" target,
+#  it is an error for autoconf to complain when
+#  this file is absent.

@@ -1,0 +1,91 @@
+#!/bin/sh
+# Run all nauty checks
+
+runonetest() {
+cmd="$1"
+in="$2"
+ok="$3"
+printf "%s %s %s  " "$cmd" "$in" "$ok"
+ 
+if [ "X$in" = "X" ] ; then
+   in=/dev/null
+elif [ ! -r "$in" ] ; then
+   echo "File $in not found or not readable."
+   exit 1
+fi
+
+if [ ! -r "$ok" ] ; then
+   echo "File $ok not found or not readable."
+   exit 1
+fi
+
+out1=`mktemp runtest.XXXXXX`
+out2=`mktemp runtest.XXXXXX`
+
+eval $cmd <"$in" 2>$out2 >$out1
+LC_COLLATE=C sort $out2 >>$out1
+if ./naucompare "$out1" "$ok" ; then
+   rm $out1 $out2
+else
+   echo "Output file is $out1"
+   rm $out2
+   fails=`expr $fails + 1`
+fi
+}
+
+fails=0
+
+runonetest ./dreadtest nautest1.dre nautest1a.ans
+runonetest "./dreadtest -o As" nautest1.dre nautest1b.ans
+runonetest "./dreadtest -o At" nautest1.dre nautest1c.ans
+runonetest ./dreadtestS nautest1.dre nautest1a.ans
+runonetest "./dreadtestS -o As" nautest1.dre nautest1b.ans
+runonetest ./dreadtestW nautest1.dre nautest1a.ans
+runonetest "./dreadtestW -o As" nautest1.dre nautest1b.ans
+runonetest ./dreadtestL nautest1.dre nautest1a.ans
+runonetest "./dreadtestL -o As" nautest1.dre nautest1b.ans
+runonetest ./dreadtestL1 nautest1.dre nautest1a.ans
+runonetest "./dreadtestL1 -o As" nautest1.dre nautest1b.ans
+runonetest ./dreadtest4K nautest1.dre nautest1a.ans
+runonetest "./dreadtest4K -o As" nautest1.dre nautest1b.ans
+runonetest "./dreadtest4K -o At" nautest1.dre nautest1c.ans
+
+runonetest ./dreadtest nautest2.dre nautest2a.ans
+runonetest "./dreadtest -o As" nautest2.dre nautest2b.ans
+runonetest "./dreadtest -o At" nautest2.dre nautest2c.ans
+runonetest ./dreadtestS nautest2.dre nautest2a.ans
+runonetest "./dreadtestS -o As" nautest2.dre nautest2b.ans
+runonetest ./dreadtestW nautest2.dre nautest2a.ans
+runonetest "./dreadtestW -o As" nautest2.dre nautest2b.ans
+runonetest "./dreadtestW -o At" nautest2.dre nautest2c.ans
+runonetest ./dreadtestL nautest2.dre nautest2a.ans
+runonetest "./dreadtestL -o As" nautest2.dre nautest2b.ans
+runonetest "./dreadtestL -o At" nautest2.dre nautest2c.ans
+runonetest ./dreadtest1 nautest2.dre nautest2a.ans
+runonetest "./dreadtest1 -o As" nautest2.dre nautest2b.ans
+runonetest ./dreadtestS1 nautest2.dre nautest2a.ans
+runonetest "./dreadtestS1 -o As" nautest2.dre nautest2b.ans
+runonetest ./dreadtestW1 nautest2.dre nautest2a.ans
+runonetest "./dreadtestW1 -o As" nautest2.dre nautest2b.ans
+runonetest ./dreadtestL1 nautest2.dre nautest2a.ans
+runonetest "./dreadtestL1 -o As" nautest2.dre nautest2b.ans
+runonetest ./dreadtest4K nautest2.dre nautest2a.ans
+runonetest "./dreadtest4K -o As" nautest2.dre nautest2b.ans
+
+runonetest "./geng -ud1D7t 11" "" nautesta.ans
+runonetest "./geng -cd1f 10 | ./labelg -q" "" nautestb.ans
+runonetest "./genrang -r3 114 100 | ./countg --nedDr -q" "" nautestc.ans
+runonetest "./gentourng -q -z 8 | ./pickg -T3" "" nautestd.ans
+runonetest "./gentreeg -q -s 18 | ./countg -z6 --o" "" nauteste.ans
+runonetest "./geng -c -q 8 8 | ./directg -q -o | ./converseg -q | ./labelg -q" "" nautestf.ans
+runonetest "./genbg -q 4 3 10 | ./vcolg -m6 -T" "" nautestg.ans
+
+echo " "
+
+if [ $fails -eq 0 ] ; then
+   echo "PASSED ALL TESTS"
+   exit 0
+else
+   echo "$fails TESTS FAILED"
+   exit 1
+fi

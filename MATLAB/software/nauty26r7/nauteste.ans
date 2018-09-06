@@ -1,0 +1,15 @@
+        2 graphs : orbits=6
+       16 graphs : orbits=7
+       29 graphs : orbits=8
+       32 graphs : orbits=9
+       21 graphs : orbits=10
+       14 graphs : orbits=11
+       23 graphs : orbits=12
+      218 graphs : orbits=13
+     1071 graphs : orbits=14
+     2658 graphs : orbits=15
+     4002 graphs : orbits=16
+     3375 graphs : orbits=17
+     1408 graphs : orbits=18
+ 12869 graphs altogether from 123867 read; cpu=0.730 sec
+>A ./countg --o -z6

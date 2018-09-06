@@ -1,0 +1,39 @@
+This is the license for the software package Nauty and
+Traces, package versions 2.6r3 and later.
+
+Four categories of software are included in the package:
+A. All files not listed as B-D below, copyright Brendan McKay (1984-)
+B. Files traces.h, traces.c and dretodot.c, copyright Adolfo Piperno (2008-)
+C. File watercluster2.c, copyright Gunnar Brinkmann (2009-)
+D. Files planarity.h and planarity.c, copyright Magma project,
+   University of Sydney
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this software except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Brendan McKay: Australian National University; Brendan.McKay@anu.edu.au
+Adolfo Piperno: University of Rome "Sapienza"; piperno@di.uniroma1.it
+Gunnar Brinkmann: University of Ghent; Gunnar.Brinkmann@UGent.be
+Magma Administration: University of Sydney; admin@maths.usyd.edu.au
+
+---END-OF-FORMAL-COPYRIGHT-NOTICE---
+
+Earlier (pre-2.6) versions of this package carried a different
+notice: "Permission is hereby given for use and/or distribution
+with the exception of sale for profit or application with nontrivial
+military significance." These days most people use nauty via a
+larger package such as Magma, Sage, or GAP, and often they don't
+even know they are using nauty. Due to the legal nonsense that
+large package distributors need to worry about, it has proved too
+much trouble to maintain an idiosyncratic licence. I didn't change
+my opinion about military use, but it is no longer part of the
+formal notice. Brendan McKay (Jan 20, 2016)

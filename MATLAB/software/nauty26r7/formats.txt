@@ -1,0 +1,219 @@
+Description of graph6, sparse6 and digraph6 encodings
+-----------------------------------------------------
+Brendan McKay, bdm@cs.anu.edu.au
+Updated Jun 2015.
+
+General principles:
+
+  All numbers in this description are in decimal unless obviously 
+  in binary.
+
+  Apart from the header, there is one object per line. Apart from
+  the header, end-of-line characters, and the characters ":", ";"
+  and "&" which might start a line, all bytes have a value in the
+  range 63-126 (which are all printable ASCII characters). A file of
+  objects is a text file, so whatever end-of-line convention is
+  locally used is fine; however the C library input routines must
+  show the standard single-LF end of line to programs).
+
+Bit vectors:
+
+  A bit vector x of length k can be represented as follows.  
+      Example:  1000101100011100
+
+  (1) Pad on the right with 0 to make the length a multiple of 6.
+      Example:  100010110001110000
+
+  (2) Split into groups of 6 bits each.
+      Example:  100010 110001 110000
+
+  (3) Add 63 to each group, considering them as bigendian binary numbers.
+      Example:  97 112 111
+
+  These values are then stored one per byte.  
+  So, the number of bytes is ceiling(k/6).
+
+  Let R(x) denote this representation of x as a string of bytes.
+      
+Small nonnegative integers:
+ 
+  Let n be an integer in the range 0-68719476735 (2^36-1).
+
+  If 0 <= n <= 62, define N(n) to be the single byte n+63.
+  If 63 <= n <= 258047, define N(n) to be the four bytes
+      126 R(x), where x is the bigendian 18-bit binary form of n.
+  If 258048 <= n <= 68719476735, define N(n) to be the eight bytes
+      126 126 R(x), where x is the bigendian 36-bit binary form of n.
+
+  Examples:  N(30) = 93
+             N(12345) = N(000011 000000 111001) = 126 66 63 120
+             N(460175067) = N(000000 011011 011011 011011 011011 011011)
+                          = 126 126 63 90 90 90 90 90
+
+
+Description of graph6 format.
+----------------------------
+
+Data type:  
+   simple undirected graphs of order 0 to 68719476735.
+
+Optional Header: 
+   >>graph6<<     (without end of line!)
+
+File name extension:
+   .g6
+
+One graph:
+   Suppose G has n vertices.  Write the upper triangle of the adjacency
+   matrix of G as a bit vector x of length n(n-1)/2, using the ordering
+   (0,1),(0,2),(1,2),(0,3),(1,3),(2,3),...,(n-1,n).
+
+   Then the graph is represented as  N(n) R(x).
+
+Example:
+   Suppose n=5 and G has edges 0-2, 0-4, 1-3 and 3-4.
+
+   x = 0 10 010 1001
+    
+   Then N(n) = 68 and R(x) = R(010010 100100) = 81 99.
+   So, the graph is  68 81 99.
+
+
+Description of sparse6 format.
+------------------------------
+
+Data type:
+   Undirected graphs of order 0 to 68719476735.
+   Loops and multiple edges are permitted.
+
+Optional Header:
+   >>sparse6<<     (without end of line!)
+
+File name extension:
+   .s6
+
+General structure:
+
+  Each graph occupies one text line. Except for the first character
+  and end-of-line characters, each byte has the form 63+x, where 
+  0 <= x <= 63. The byte encodes the six bits of x.
+
+  The encoded graph consists of:
+        (1) The character ':'.   (This is present to distinguish
+                                  the code from graph6 format.)
+        (2) The number of vertices.
+        (3) A list of edges.
+        (4) end-of-line
+
+  Loops and multiple edges are supported, but not directed edges.
+
+Number of vertices n:
+
+  1, 4, or 8 bytes N(n) as above.
+  This is the same as graph6 format.
+
+List of edges:
+
+  Let k be the number of bits needed to represent n-1 in binary.
+  
+  The remaining bytes encode a sequence 
+
+      b[0] x[0] b[1] x[1] b[2] x[2] ... b[m] x[m]
+
+  Each b[i] occupies 1 bit, and each x[i] occupies k bits.
+  Pack them together in bigendian order, and pad up to a
+  multiple of 6 as follows:
+  1. If (n,k) = (2,1), (4,2), (8,3) or (16,4), and vertex
+     n-2 has an edge but n-1 doesn't have an edge, and
+     there are k+1 or more bits to pad, then pad with one
+     0-bit and enough 1-bits to complete the multiple of 6.
+  2. Otherwise, pad with enough 1-bits to complete the
+     multiple of 6.
+  These rules are to match the gtools procedures, and to avoid
+  the padding from looking like an extra loop in unusual cases.
+
+  Then represent this bit-stream 6 bits per byte as indicated above.
+
+  The vertices of the graph are 0..n-1.
+  The edges encoded by this sequence are determined thus:
+
+     v = 0
+     for i from 0 to m do
+        if b[i] = 1 then v = v+1 endif;
+        if x[i] > v then v = x[i] else output {x[i],v} endif
+     endfor
+
+   In decoding, an incomplete (b,x) pair at the end is discarded.
+
+Example:
+
+  :Fa@x^
+
+  ':' indicates sparse6 format.
+  Subtract 63 from the other bytes and write them in binary, 
+  six bits each.
+
+   000111 100010 000001 111001 011111
+
+  The first byte is not 63, so it is n.  n=7
+  n-1 needs 3 bits (k=3).  Write the other bits in groups
+  of 1 and k:
+
+    1 000  1 000  0 001  1 110   0 101  1 111
+  
+    This is the b/x sequence  1,0 1,0 0,1 1,6 0,5 1,7.
+    The 1,7 at the end is just padding.
+    The remaining parts give the edges 0-1 0-2 1-2 5-6.
+
+
+Description of incremental sparse6 format.
+-----------------------------------------
+
+  This is an extension to sparse6 format that is very efficient if most
+  graphs in a file are similar to the previous graph.
+
+  Each graph occupies one text line. Except for the first character
+  and end-of-line characters, each byte has the form 63+x, where 
+  0 <= x <= 63. The byte encodes the six bits of x.
+
+  The encoded graph consists of:
+        (1) The character ';'.
+        (2) A list of edges.
+        (3) end-of-line
+
+  This cannot appear as the first graph in a file.  The number of vertices
+  is taken to be equal to the number of vertices in the previous graph.
+  The list of edges specifies the symmetric difference of this graph and
+  the previous graph.  It is encoded exactly the same as part (3) of
+  sparse6 format.
+
+  Loops are supported, but not multiple edges.
+
+
+Description of digraph6 format.
+------------------------------
+
+Data type:  
+   simple directed graphs (allowing loops) of order 0 to 68719476735.
+
+Optional Header: 
+   >>digraph6<<     (without end of line!)
+
+File name extension:
+   .d6
+
+One graph:
+   Suppose G has n vertices. Write the adjacency matrix of G
+   as a bit vector x of length n^2, row by row.
+
+   Then the graph is represented as '&' N(n) R(x).
+   The character '&' (decimal 38) appears as the first character.
+
+Example:
+   Suppose n=5 and G has edges 0->2, 0->4, 3->1 and 3->4.
+
+   x = 00101 00000 00000 01001 00000
+    
+   Then N(n) = 68 and
+   R(x) = R(00101 00000 00000 01001 00000) = 73  63  65  79  63.
+   So, the graph is  38 68 73  63  65  79  63.

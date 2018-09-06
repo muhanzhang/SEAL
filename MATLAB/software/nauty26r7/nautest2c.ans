@@ -1,0 +1,17 @@
+1-12:2 
+ 1 cell; code = 1; cpu time = 0.0000000 seconds
+unit partition
+Gen #1: (1 12 11 10 9 8 7 6 5 4 3 2)
+Gen #2: (1 2)(3 12)(4 11)(5 10)(6 9)(7 8)
+1 orbit; grpsize=24; 2 gens; 1 node (1 peak); maxlev=0
+cpu time = 0.00 seconds
+Gen #1: (1 12 11 10 9 8 7 6 5 4 3 2)
+Gen #2: (1 2)(3 12)(4 11)(5 10)(6 9)(7 8)
+1 orbit; grpsize=24; 2 gens; 1 node (1 peak); maxlev=0
+canupdates=0; cpu time = 0.00 seconds
+[T40ae9d28 336706d1 2832ac44]
+Gen #1: (1 11 5 7 2 9 12 3 8 6 4 10)
+Gen #2: (1 10)(2 3)(4 11)(5 6)(7 8)(9 12)
+1 orbit; grpsize=24; 2 gens; 1 node (1 peak); maxlev=0
+canupdates=0; cpu time = 0.00 seconds
+[T40ae9d28 336706d1 2832ac44]

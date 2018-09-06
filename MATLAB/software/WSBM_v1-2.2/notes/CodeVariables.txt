@@ -1,0 +1,111 @@
+Outline of WSBM Variables - To be put into LaTeX Later
+Christopher Aicher
+v1 - 10/18 The Variables/Structs
+
+Important Variables:
+  A - adjacency matrix
+  E - edge list
+  n - number of vertices
+  k - number of groups/blocks/roles
+  r - number of edge bundles
+  m_E,m_N,m_M  - number of weighted edges, non-edges, and missing edges respectively. 
+  dw_in(i) - the in-degree of weighted edges for vertex i
+  dw_out(i) - the out-degree of weighted edges for vertex i
+  
+Important Structures:
+  Model – a struct of Data, W_Distr, E_Distr, R_Struct, Para, Options structs
+  Data – a struct for raw and formatted observed data
+  W_Distr – a struct for the weight distribution in our WSBM
+  E_Distr – a struct for the edge distribution in our WSBM
+  R_Struct – a struct for the edge-bundle structure in our WSBM
+  Para – a struct for the inferred parameters in our WSBM
+  Options - a struct for the inference options settings
+  Flags - a struct for algorithm convergence checks
+
+Model
+  Struct Containing the following fields:
+	Data (Struct)
+	W_Distr (Struct)
+	E_Distr (Struct)
+	R_Struct (Struct)
+	Para (Struct)
+	Options (Struct)
+
+Data (With MEX Files On)
+  Struct containing the following fields:
+	n - number of vertices
+	T_w - (t_w+2) by m_E list of W_Distr Sufficient Statistics
+	T_e - (t_e-1+2) by m_E list of E_Distr Sufficient Statistics
+	degrees_w - 2 by n vector of weighted in- and out- degrees for each vertex (counts weighted edges only)
+	degrees_total - 2 by n vector of total in- and out- degrees for each vertex (countes weighted edges and nans)
+	T_w_in, T_w_out - n by 1 cell arrays of W_Distr Sufficient Statistics
+		Each cell is a 1+t_w by d_in or d_out matrix
+	T_e_in, T_e_out - n by 1 cell arrays of E_Distr Sufficient Statistics
+		Each cell is a 1+t_e-1 by d_in or d_out matrix
+	logHw - Additive Log-likelihood constant for W_Distr
+	logHe - Additive Log-likelihood constant for E_Distr
+	
+W_Distr 
+  Struct containing the following fields:
+	name - string
+	distr* - to generate data (func of nrow,ncol,theta)
+	cdf* - cdf of continous functions (func of A,theta)
+	tau_0 - 1 by t_w vector of prior parameters
+	logh* - inline function for additive log-likelihood constant (func of A)
+	T - t_w by 1 cell array of inline sufficient statistic functions (func of A)
+	Eta - t_w by 1 cell array of inline natural parameter functions (func of tau)
+	logZ* - inline function for logZ (func of tau)
+	Theta* - inline function for Expected Theta (func of tau)
+	Predict* - inline function to predict A (func of theta)
+  *-denotes inline functions
+
+E_Distr 
+  Struct with the same fields as W_Distr but for edge existence distributions
+  Note that for DC-Poisson Distr, T{end} is a function of Data.Degree, and Predict is off by a factor depending on the end-vertices' Degree.
+  
+R_Struct
+  Struct containing the following fields:  
+	name - string 
+	R - k by k matrix mapping to edge bundle (k by k -> r)
+	r - number of edge bundles
+	k - number of groups/blocks
+
+Para 
+  Struct containing the following fields:
+	mu - k by n matrix, mu(z,i) = prob vertex i is in group z
+	tau_w - r by t_w matrix, tau of W_Distr for each edge bundle
+	tau_e - r by t_e matrix, tau of E_Distr for each edge bundle
+	theta - r by dim(theta) matrix, estimate of Theta for each edge bundle
+	predict_w - r by 1 vector of predicted weighted edge values
+	predict_e - r by 1 vector of predicted edge-existence probabilities
+	LogEvidence - Marginal Log-likelihood (aka Log-Evidence), a model selection criterion 
+ 
+Options
+  Struct containing the following fields:
+	algtype - 'vb' or 'bp'
+	alpha - scaling parameter between W_Distr and E_Distr(0.5 Default)
+	networkType - Directed (default), Symmetric, Skew-Symmetric (CA: I Think this can be cut)
+	nanType - 'Missing' (default),'Non-Edge'
+	parallel - boolean, 1 if to run in parallel
+	save - boolean, 1 if to save temp output
+	outputpath - string to where to save temp output
+	verbosity - 0 silent, 1 default, 2 verbose, 3 very verbose
+	seed - seed for algtype (mu_0 or mes_0)
+	mainMaxIter, mainTol - Max Iter and Tolerance of main loop
+	muMaxIter, muTol - Max Iter and Tolerance of mu loop
+	mexFile - boolean, 1 if mex files are complied and will be used.
+    mu_0 - kxn matrix prior vector for vertex-label parameters(sums to 1)
+
+
+Flags
+  Struct containing the following fields:
+	mainConv - bool, convergence flag for main loop
+	mainDiff - max abs difference in mu values for main loop
+	mainIter - number of iterations
+	muConv - bool, convergence flag for mu loop
+	muDiff - max abs difference in mu values for mu loop
+	
+	
+	
+	
+	

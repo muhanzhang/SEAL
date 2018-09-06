@@ -1,0 +1,23 @@
+=== Introduction ===
+
+This folder contains Matlab scripts: WL.m, WLedge.m, WLspdelta.m,
+RGkernel.m, l3graphletkernel.m. lRWkernel.m, untilpRWkernel.m, spkernel.m
+
+WL.m computes the Weisfeiler-Lehman subtree kernel
+WLedge.m computes the Weisfeiler-Lehman edge kernel
+WLspdelta.m computes the Weisfeiler-Lehman shortest path kernel (with 
+exact matching of shortest path lengths)
+on graphs with unweighted unlabeled edges, with/without discrete node labels.
+
+RGkernel.m - Ramon and Gaertner subtree kernel
+l3graphletkernel.m - labeled 3-node graphlet kernel
+lRWkernel.m - labeled random walk kernel
+untilpRWkernel.m - labeled random walk kernel up to p-step random walks
+spkernel.m - labeled shortest path kernel (with delta kernel on shortest path lengths)
+
+
+=== Usage ===
+
+For each script X.m, the Matlab command
+  help X
+will display instructions on how to use the script X.m 

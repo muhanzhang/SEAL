@@ -1,0 +1,292 @@
+
+README file for nauty 2.4 
+
+Brendan McKay, bdm@cs.anu.edu.au
+
+------------------------------------------------------------
+
+The most recent distribution of nauty can be found at
+http://cs.anu.edu.au/~bdm/nauty .
+
+The manual nug.pdf is available at that site and is also included
+in the distribution package.
+
+Note that nauty is copyright but free to use for most purposes.
+The details are in the file nauty.h.
+
+The code in the file planarity.c (used by the planarg program)
+is copyright to the Magma project. 
+
+------------------------------------------------------------
+
+INSTALLATION.
+
+The first step is to unpack the archive.  On Unix-ish systems
+you can use one of these commands:
+
+   tar xzf nauty24.tar.gz
+or
+   gunzip -c nauty24.tar.gz | tar xf -
+
+This will write all the files into the subdirectory nauty24.
+Go to that directory.
+
+If you have a working shell, and make, you can run
+   ./configure
+followed by
+   make all
+to compile nauty for your system.
+
+If that succeeds without problem, you will have have the
+program dreadnaut ready to run.
+
+If you have problems during compilation, it may be that the
+configuration scripts are inadequate for your system.  Usually it
+is because of some missing system header, incompatible typedef,
+or similar.  Please send the details to the author.
+
+If you don't have a shell or make, manually edit the files nauty.h,
+naututil.h and gtools.h as distributed.  The parts between the lines
+======= near the start are the main things to look at.  After this
+manual editing, you can use makefile as a guide to compilation.
+
+Programs which use an older version of nauty need to be
+recompiled (** not just relinked **). Make sure they use the
+DEFAULTOPTIONS_GRAPH or DEFAULTOPTIONS_SPARSEGRAPH macro to define
+the fields of the options parameter.
+
+See below for compiling on a PC under DJGPP.
+
+If you are using Windows in an environment that needs Windows line
+endings (which is a configuration option in Cygwin, for example),
+then you might prefer to use nauty24.zip rather than
+nauty24.tar.gz.
+
+------------------------------------------------------------
+
+TESTING.
+
+After compiling nauty successfully, it is recommended that you run
+the included test programs.  The simplest way is
+    make checks
+
+------------------------------------------------------------
+
+MAILING LIST.
+
+There is a mailing list for announcements and discussion about
+nauty and related topics.  You can subscribe at
+http://dcsmail.anu.edu.au/cgi-bin/mailman/listinfo/nauty-list
+
+------------------------------------------------------------
+
+OTHER FILES IN THE PACKAGE.
+
+A few additional goodies are included.
+
+sumlines.c  -  This is a program designed to digest the outputs from
+  multiple runs of a program (such as a computation split into multiple
+  parts).  Lines matching given patterns can be counted and checked,
+  and numbers appearing in them can be accumulated.  Instructions appear
+  in the source file.  See the option GMP near the head of the program
+  before trying to compile.
+
+naugroup.h, naugroup.c  -  These define procedures for exhaustively
+  listing a group found by nauty.  This is done in a space-efficient way.
+  A sample program appears in nautyex3.c, but so far there is no
+  complete documentation.
+
+------------------------------------------------------------
+
+DJGPP.
+
+The Unix-like environment DJGPP can be used to run nauty and gtools on
+DOS/Win computers.  DJGPP is available at http://www.delorie.com/djgpp .
+The program shortg does not work since DJGPP does not provide a working
+pipe() system call.  Using the bash shell is recommended.  In DOS,
+Windows NT and early Windows editions, you will need to convert all
+long file names to the 8+3 limits.  Thanks to Guenter Sterntenbrink
+for helping with this.
+
+If configure gives an error message similar to this:
+   can not guess host type: you must specify one
+then try
+   ./configure --host=i686
+or use i586 for Pentium 2.  If all of those fail, try
+   ./configure --host=unknown
+
+------------------------------------------------------------
+
+Making 32-bit executables on 64-bit Linux systems.
+
+(In bash or sh:)
+CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32 ./configure
+make clean; make
+
+This requires the libraries ia32-libs and libc6-dev-i386.
+
+------------------------------------------------------------
+
+RECENT CHANGES.
+
+Here we list substantive changes made since the first 2.2 release.
+
+Nov 16, 2002:  Replaced rng.c after communication with Don Knuth.
+  The previous version had a bug (mine!) when there was no explicit
+  initialization done by the user.  It appears the error had no
+  impact on nauty (which only uses rng.c for the "s" command in
+  dreadnaut, and for genrang, but both always initialize).
+  No change to the nauty version number but beta=2.
+
+Nov 18, 2000:  Adjusted the makefile and countg/testg to work in
+  the DOS/Win environment DJGPPP (see the previous section).
+
+May 1, 2003:  Fixed PRUNE feature of genbg.
+
+May 3, 2003:  Added utility directg for making all orientations of graphs.
+
+Oct 4, 2003:  Added options -a, -Z, -d, -z to genbg.  Also, the -l
+              (canonical label) option now preserves the colouring.
+
+Nov 17, 2003: Renamed INFINITY to NAUTY_INFINITY since many C header
+              libraries define INFINITY.  If INFINITY is not defined by
+              the system, you can still use it.
+
+Nov 19, 2003: Added program biplabg to relabel bipartite graphs with the
+              colour classes contiguous.
+
+Feb 13, 2004: Revised C options for solaris on pentium
+
+Mar 1, 2004:  dretog knows !...\n type of comment
+
+May 7, 2004:  geng can be called from another program (see instructions
+              in geng.c.)
+
+May 29, 2004: added definition of SETWORD_FORMAT used to write a setword
+              with printf( ) - see nauty.h
+
+Sep 11, 2004: Added utility multig for making multigraphs based on
+              provided simple graphs; similar to directg
+
+Oct 16, 2004: To avoid problems caused by system-dependent handling of
+              external declarations, nauty() no longer accepts NULL as
+              the value of options.dispatch.  To get the previous
+              behaviour, use the value &graph_dispatch.  This will be
+              handled automatically if programs calling nauty use
+              DEFAULTOPTIONS to declare options and are recompiled.
+              Even better is to use DEFAULTOPTIONS_GRAPH.
+
+May 5, 2005:  A bug in the writing of sparse6 was found and fixed.
+              This is procedure ntos6() in gtools.c, which is invoked
+              by writes6().  The bug could only happen if all the
+              following are true:
+              1.  n = 2, 4, 8 or 16 (for n=2, only if the graph has loops)
+              2.  Vertex n-2 has non-zero degree, but vertex n-1 has
+                  zero degree.
+              These conditions never happen for graphs generated by
+              geng or genbg, nor for regular graphs or connected graphs,
+              nor for graphs canonically labelled by nauty (except maybe
+              with some unusual vertex colouring or invariant).
+              If the conditions do happen, the buggy routine may
+              (with some probability) add a spurious loop to vertex n-1.
+
+              In the package is a utility checks6:
+
+              Usage: checks6 [-w] [infile [outfile]]
+              Check a file of graphs, optionally write corrected version
+              -w  Write corrected graphs (default is not to write)
+
+------now we start version 2.3 (not released) and 2.4------
+
+Nov 10, 2004: Use faster routine getc_unlocked() for reading graphs if
+              available.  It can make a surprising difference.
+
+Nov 17, 2004: If putenv() or setenv() are available, we set LC_COLLATE to
+              "C" before executing "sort" in shortg.  This should alleviate
+	      collation issues with sort.  However, note that many
+              utilities use the locale these days so you are advised to
+	      have LC_COLLATE defined to be "C" always when you are dealing
+              with files of graphs.
+
+              Six counters in statsblk became "unsigned long" instead of
+              "long".  nauty doesn't actually use these, but we might as
+              well give them twice as long before they overflow.
+
+Nov 24, 2004: Made geng faster for generating trees.  The output labelling
+              may be different from before.  A very much faster tree
+              generator is in the works.
+
+Jan 17, 2005: Added two items to dispatch vectors:
+               init   : used for initialising something at the start
+              cleanup : used for doing something at the end, such as
+                        freeing space allocated by init()
+              See the manual for calling sequences.
+
+May 20, 2005: Update graph6 and sparse6 formats to allow much large sizes.
+              The limit is now 68719476735 vertices (best of luck getting
+              close to that!).
+
+Nov 12, 2005: Changed NAUTY_INFINITY to 2^30+2 in BIGNAUTY case
+
+2006 various: Procedures for sparse graphs implemented.
+
+              New program planarg to test for planarity and find
+              planar embeddings:   planarg -help  for details.
+	      The planarity code was written by Paulette Lieby for the
+              Magma project and used with permission.
+
+	      labelg got -S to use sparse graphs.
+              genbg -N changed to genbg -n (only Gordon uses this).
+              genrang gained -R switch for regular graphs in text format.
+              gtools.c has code for reading and writing planarcode.
+              listg got a compile time option to select "Matrix" or
+                 "array" for Maple output.
+              pickg/countg got -T for counting triangles
+
+	      Better configuration for MacOSX.
+
+Nov 22, 2006: Removed usertcellproc from options.  Greater functionality
+              is now available using the new targetcell field in the
+              dispatch vector.  The u8 command has gone from dreadnaut.
+
+              Changed bestcell to targetcell in dispatch vector.
+
+Nov 29, 2006: Added extraoptions field (currently unused) to optionblk
+
+Dec 9, 2006:  Added an invariant adjacencies_sg(), recommended for digraphs
+              when using sparse representation.
+
+Dec 10, 2006: Remove BIGNAUTY, whose usefulness has passed.  Now the types
+	      shortish and permutation are synonymous with int always.
+              The limit on the number of vertices is 2^30 unless int
+              has only 16 bits (still any of them around?) in which
+              case it is 2^15-3. Programs previously linked with
+              files like nautyB.o can now be linked with nauty.o.
+              Alternatively, "make bigs" will create files like
+              nautyB.o by copying.
+
+June 26, 2007:  Fixed an error in  listg -s  reported by Evan Heidtmann.
+
+July 12, 2007:  Added -f option to directg.
+
+Aug 14, 2007:  Added -i,-I,-K options to shortg, parallel to labelg.
+              Since -k is used in labelg in place of -I, changed labelg
+              to use -I also, with -k remaining as an undocumented
+              compatibility feature.
+
+Aug-Sep 2007: Minor things:
+              * naututil-h.in now defines CPUTIME=0.0 as a last resort
+              * gtools.c now implements EDGECODE (not used anywhere yet)
+              * fixed definition of SG_FREE in nausparse.h (not used)
+              * geng favours space over time for n > 28 
+
+Oct 14, 2007: Added -T switch to shortg to specify scratch directory.
+
+Mar 3, 2008:  Fixed makefile for compilation in a 64-bit environment.
+
+Oct 11, 2008: Added -l and -m to genrang
+
+Nov 29, 2008: Slightly improved -c for geng and genbg
+              Added tournament generator gentourng.
+
+Mar 3, 2009:  Added -V to directg.

@@ -1,0 +1,11 @@
+This folder contains Matlab scripts for computing various kernels for unweighted unlabeled graphs. These are:
+- the random walk kernel (RWkernel.m) 
+- the shortest path kernel (SPkernel.m) 
+- all 3 and 4-node graphlet kernels (allkernel.m in allgraphlets folder)
+- all 3,4,5-node graphlet kernels that use sampling (gestkernelK.m for K={3,4,5} in samplinggraphlets folder)
+- connected 3,4,5-node graphlet kernels (connectedkernel.m in connectedgraphlets folder)
+
+The other scripts are auxiliary.
+
+Typing "help script_name" will give you information about the input and output of the corresponding script.
+

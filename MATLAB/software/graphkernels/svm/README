@@ -1,0 +1,11 @@
+runmultiplesvm - cross-validate over different kernels and the parameter C of SVM and repeat the experiment n times with different folds. 
+                 This is used with the output of all WL* scripts in the folder "labeled" - a cell array of kernel matrices. To be able 
+                 to use it, you have to replace "~/code/libsvm" in runsvm.m by the name of the folder where you put the compiled mex files 
+                 (svmtrain and svmpredict) of the libSVM Matlab interface.
+
+runntimes      - cross-validate over the parameter C of SVM and repeat the experiment n times with different folds.
+                 This is used with a single kernel matrix. To be able to use it, you have to replace "~/code/libsvm" 
+                 in runIndependent.m by the name of the folder where you put the compiled mex files 
+                 (svmtrain and svmpredict) of the libSVM Matlab interface.
+
+To obtain information on input and output, run "help runmultiplesvm" and "help runntimes" respectively.
