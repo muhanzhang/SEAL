@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description='Link Prediction with SEAL')
 parser.add_argument('--data-name', default='USAir', help='network name')
 parser.add_argument('--train-name', default=None, help='train name')
 parser.add_argument('--test-name', default=None, help='test name')
-parser.add_argument('--max_train_num', type=int, default=100000, 
+parser.add_argument('--max-train-num', type=int, default=100000, 
                     help='set maximum number of train links (to fit into memory)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='disables CUDA training')

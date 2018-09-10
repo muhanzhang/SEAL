@@ -91,11 +91,13 @@ def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_infor
     # extract the h-hop enclosing subgraph around link 'ind'
     dist = 0
     nodes = set([ind[0], ind[1]])
+    visited = set([ind[0], ind[1]])
     fringe = set([ind[0], ind[1]])
     nodes_dist = [0, 0]
     for dist in range(1, h+1):
         fringe = neighbors(fringe, A)
-        fringe = fringe - nodes
+        fringe = fringe - visited
+        visited = visited.union(fringe)
         if max_nodes_per_hop is not None:
             if max_nodes_per_hop < len(fringe):
                 fringe = random.sample(fringe, max_nodes_per_hop)
