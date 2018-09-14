@@ -11,12 +11,13 @@ import scipy.io as sio
 import scipy.sparse as ssp
 from sklearn import metrics
 from gensim.models import Word2Vec
+import warnings
+warnings.simplefilter('ignore', ssp.SparseEfficiencyWarning)
 cur_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append('%s/../../pytorch_DGCNN' % cur_dir)
 sys.path.append('%s/software/node2vec/src' % cur_dir)
 from util import S2VGraph
 import node2vec
-
 
 def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num=None):
     # get upper triangular matrix
@@ -71,19 +72,19 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
             print('\033[91mChoose h=1\033[0m')
 
     # extract enclosing subgraphs
-    max_n_label = {'val': 0}
+    max_n_label = {'value': 0}
     def helper(A, links, g_label):
         g_list = []
         for i, j in tqdm(zip(links[0], links[1])):
             g, n_labels, n_features = subgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
-            max_n_label['val'] = max(max(n_labels), max_n_label['val'])
+            max_n_label['value'] = max(max(n_labels), max_n_label['value'])
             g_list.append(S2VGraph(g, g_label, n_labels, n_features))
         return g_list
     print('Enclosing subgraph extraction begins...')
     train_graphs = helper(A, train_pos, 1) + helper(A, train_neg, 0)
     test_graphs = helper(A, test_pos, 1) + helper(A, test_neg, 0)
     print(max_n_label)
-    return train_graphs, test_graphs, max_n_label['val']
+    return train_graphs, test_graphs, max_n_label['value']
 
 
 def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_information=None):
@@ -120,7 +121,7 @@ def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_infor
     if node_information is not None:
         features = node_information[nodes]
     # construct nx graph
-    g = nx.from_numpy_matrix(subgraph.toarray())
+    g = nx.from_scipy_sparse_matrix(subgraph)
     return g, labels.tolist(), features
 
 

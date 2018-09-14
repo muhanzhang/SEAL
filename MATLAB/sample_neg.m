@@ -10,8 +10,8 @@ function [train_pos, train_neg, test_pos, test_neg] = sample_neg(train, test, k,
 %  -test: half test positive adjacency matrix
 %  -k: how many times of negative links (w.r.t. pos links) to 
 %      sample
-%  -portion: if specified, only a portion of the sampled train
-%            and test links be returned
+%  -portion: if specified to (e.g.) 0.5, only 50%  of the sampled
+%            train and test links will be returned
 %  -evaluate_on_all_unseen: if true, will not randomly sample
 %                          negative testing links, but regard
 %                          all links unseen during training as 
@@ -19,6 +19,8 @@ function [train_pos, train_neg, test_pos, test_neg] = sample_neg(train, test, k,
 %                          are sampled in the original way
 %  --Output--
 %  column indices for four datasets
+%
+%  *author: Muhan Zhang, Washington University in St. Louis
 %%
 
 if nargin < 3

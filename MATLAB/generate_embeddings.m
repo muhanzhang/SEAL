@@ -8,6 +8,8 @@ function [node_embeddings] = generate_embeddings(A, data_name, emd_method)
 %  --Output--
 %  -node_embeddings: a matrix, ith row contains the ith node's embeddings
 %
+%  *author: Muhan Zhang, Washington University in St. Louis
+%%
 
 if nargin < 3
     emd_method = 'node2vec'

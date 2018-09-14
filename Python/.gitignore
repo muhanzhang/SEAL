@@ -1,3 +1,4 @@
 *.pyc
 backup/
 *results.txt
+test_scores.txt

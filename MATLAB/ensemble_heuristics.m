@@ -10,7 +10,7 @@ function [auc, precision] = ensemble_heuristics(train_mix, test, all_sims)
 %  -all_sims: similarity scores of all heuristics
 %  --Output--
 %  -auc: the AUC score on testing links
-
+%
 %  *author: Muhan Zhang, Washington University in St. Louis
 %%
 

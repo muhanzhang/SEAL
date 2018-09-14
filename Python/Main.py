@@ -74,7 +74,7 @@ else:
     args.train_dir = os.path.join(args.file_dir, 'data/{}'.format(args.train_name))
     args.test_dir = os.path.join(args.file_dir, 'data/{}'.format(args.test_name))
     train_idx = np.loadtxt(args.train_dir, dtype=int)
-    test_idx = np.loadtxt(args.test_dir, dtype=int)[:50]
+    test_idx = np.loadtxt(args.test_dir, dtype=int)
     max_idx = max(np.max(train_idx), np.max(test_idx))
     net = ssp.csc_matrix((np.ones(len(train_idx)), (train_idx[:, 0], train_idx[:, 1])), shape=(max_idx+1, max_idx+1))
     net[train_idx[:, 1], train_idx[:, 0]] = 1  # add symmetric edges
