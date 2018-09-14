@@ -6,12 +6,15 @@ About
 
 Python version of SEAL (learning from Subgraphs, Embeddings, and Attributes for Link prediction).
 
+
 Installation
 ------------
 
-Please download our [\[pytorch_DGCNN software\]](https://github.com/muhanzhang/pytorch_DGCNN) to the same level as the root SEAL folder (not this Python folder). DGCNN is the default graph neural network in SEAL.
+Type
 
-Install pytorch_DGCNN according to its instruction.
+    bash ./install.sh
+
+to install the required software and libraries. It will download and install the default graph neural network software [\[pytorch_DGCNN\]](https://github.com/muhanzhang/pytorch_DGCNN) to the same level as the root SEAL folder (not this Python folder).
 
 
 Usages
