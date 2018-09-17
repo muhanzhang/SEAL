@@ -10,6 +10,8 @@ Python version of SEAL (learning from Subgraphs, Embeddings, and Attributes for 
 Installation
 ------------
 
+Install [PyTorch](https://pytorch.org/).
+
 Type
 
     bash ./install.sh
