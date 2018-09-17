@@ -6,7 +6,7 @@ cd pytorch_DGCNN
 unzip pytorch_structure2vec-master.zip
 cd pytorch_structure2vec-master/s2v_lib/
 make -j4
-cd ../../../SEAL/Python
+cd "$(dirname "$0")"
 pip install --user numpy
 pip install --user scipy
 pip install --user networkx
