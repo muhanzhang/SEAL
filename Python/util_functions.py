@@ -88,7 +88,6 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
 
 
 def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_information=None):
-    # todo: node info, h auto
     # extract the h-hop enclosing subgraph around link 'ind'
     dist = 0
     nodes = set([ind[0], ind[1]])
