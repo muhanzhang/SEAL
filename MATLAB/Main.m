@@ -11,21 +11,21 @@ setting = 1;
 switch setting
 case 1  % traditional link prediction benchmarks
     numOfExperiment = 10;        
-    workers = 2;  % number of workers running parallelly
+    workers = 5;  % number of workers running parallelly
     %workers = 0;  % change workers to 0 to disable parallel loop of multiple exps
     ratioTrain = 0.5; % train split ratio
     connected = false; % whether to sample test links while ensuring the remaining net is connected
     %dataname = strvcat('USAir','NS','PB','Yeast','Celegans','Power','Router','Ecoli');
     dataname = strvcat('USAir','NS','Yeast','Celegans','Power','Router'); % 
-    %dataname = strvcat('PB', 'Ecoli');  % set workers 5,  h=1 for SEAL due to memory issues
-    dataname = strvcat('PB', 'Ecoli'); % set workers 2, h=1 for WL alone due to memory issues
+    dataname = strvcat('PB', 'Ecoli');  % set workers 5,  h=1 for SEAL due to memory issues
+    %dataname = strvcat('PB', 'Ecoli'); % set workers 2, h=1 for WL alone due to memory issues
     %dataname = strvcat('USAir');
     %method = [1, 2, 3, 4, 5, 6, 7, 8, 9];  % 1: SEAL,  2: Heuristic methods 3: Traditional latent feature methods,  4: WLNM 5: WL graph kernel, 6: Embedding methods
     method =[1, 2, 3, 4, 5, 6];
-    %method =[1];
+    method =[1];
     h = 'auto';  % the maximum hop to extract enclosing subgraphs, h = 'auto' means to automatically select h from 1, 2
     h = 1;
-    include_embedding = 0;  % whether to include node embeddings in node information matrix of SEAL, needs node2vec software
+    include_embedding = 1;  % whether to include node embeddings in node information matrix of SEAL, needs node2vec software
     include_attribute = 0;
     portion = 1;  % portion of observed links selected as training data
 case 2  % network embedding benchmark datasets without node attributes

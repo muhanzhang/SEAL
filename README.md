@@ -6,6 +6,9 @@ About
 
 Code for SEAL (learning from Subgraphs, Embeddings, and Attributes for Link prediction). SEAL is a novel framework for link prediction which systematically transforms link prediction to a subgraph classification problem. For each target link, SEAL extracts its *h*-hop enclosing subgraph *A* and builds its node information matrix *X* (containing latent embeddings and explicit attributes of nodes). Then, SEAL feeds (*A, X*) into a graph neural network (GNN) to classify the link existence, so that it can learn from both graph structure features (from *A*) and latent/explicit features (from *X*) simultaneously for link prediction.
 
+For more information, please check our paper:
+> M. Zhang and Y. Chen, Link Prediction Based on Graph Neural Networks, Advances in Neural Information Processing Systems (NIPS-18). [\[Preprint\]](https://arxiv.org/pdf/1802.09691.pdf)
+
 Version
 -------
 
