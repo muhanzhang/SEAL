@@ -61,7 +61,6 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
         val_A[val_test_pos[0], val_test_pos[1]] = 0
         val_A[val_test_pos[1], val_test_pos[0]] = 0
         val_auc_CN = CN(val_A, val_test_pos, val_test_neg)
-        pdb.set_trace()
         val_auc_AA = AA(val_A, val_test_pos, val_test_neg)
         print('\033[91mValidation AUC of AA is {}, CN is {}\033[0m'.format(val_auc_AA, val_auc_CN))
         if val_auc_AA >= val_auc_CN:
