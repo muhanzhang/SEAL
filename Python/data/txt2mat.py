@@ -6,9 +6,9 @@ import argparse
 
 parse = argparse.ArgumentParser()
 parse.add_argument("-g", "--graph", help="each row is a training link")
-parse.add_argument("-u", "--users", help="users list, each row is a node")
+parse.add_argument("-u", "--users", help="users/nodes list, each row is a node")
 parse.add_argument("-n", "--dimension", help="dimension of node profile")
-parse.add_argument("-f", "--profile", help="profile information of nodes, corresponding to node list")
+parse.add_argument("-f", "--profile", help="profile information of nodes, the ordering corresponding to nodes list")
 parse.add_argument("-o", "--output", help="output .mat file")
 args = parse.parse_args()
 
