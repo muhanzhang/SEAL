@@ -16,7 +16,7 @@ warnings.simplefilter('ignore', ssp.SparseEfficiencyWarning)
 cur_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append('%s/../../pytorch_DGCNN' % cur_dir)
 sys.path.append('%s/software/node2vec/src' % cur_dir)
-from util import S2VGraph
+from util import GNNGraph
 import node2vec
 
 def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num=None):
@@ -77,7 +77,7 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
         for i, j in tqdm(zip(links[0], links[1])):
             g, n_labels, n_features = subgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
             max_n_label['value'] = max(max(n_labels), max_n_label['value'])
-            g_list.append(S2VGraph(g, g_label, n_labels, n_features))
+            g_list.append(GNNGraph(g, g_label, n_labels, n_features))
         return g_list
     print('Enclosing subgraph extraction begins...')
     train_graphs = helper(A, train_pos, 1) + helper(A, train_neg, 0)
