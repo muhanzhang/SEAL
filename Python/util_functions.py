@@ -109,9 +109,6 @@ def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_infor
     nodes.remove(ind[1])
     nodes = [ind[0], ind[1]] + list(nodes) 
     subgraph = A[nodes, :][:, nodes]
-    # remove link between target nodes
-    subgraph[0, 1] = 0
-    subgraph[1, 0] = 0
     # apply node-labeling
     labels = node_label(subgraph)
     # get node features
@@ -120,6 +117,9 @@ def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_infor
         features = node_information[nodes]
     # construct nx graph
     g = nx.from_scipy_sparse_matrix(subgraph)
+    # remove link between target nodes
+    if g.has_edge(0, 1):
+        g.remove_edge(0, 1)
     return g, labels.tolist(), features
 
 
