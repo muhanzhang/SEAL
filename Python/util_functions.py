@@ -2,7 +2,7 @@ from __future__ import print_function
 import numpy as np
 import random
 from tqdm import tqdm
-import os, sys, pdb, math
+import os, sys, pdb, math, time
 import cPickle as cp
 #import _pickle as cp  # python3 compatability
 import networkx as nx
@@ -18,6 +18,7 @@ sys.path.append('%s/../../pytorch_DGCNN' % cur_dir)
 sys.path.append('%s/software/node2vec/src' % cur_dir)
 from util import GNNGraph
 import node2vec
+import multiprocessing as mp
 
 def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num=None):
     # get upper triangular matrix
@@ -73,18 +74,42 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
     # extract enclosing subgraphs
     max_n_label = {'value': 0}
     def helper(A, links, g_label):
+        '''
         g_list = []
         for i, j in tqdm(zip(links[0], links[1])):
             g, n_labels, n_features = subgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
             max_n_label['value'] = max(max(n_labels), max_n_label['value'])
             g_list.append(GNNGraph(g, g_label, n_labels, n_features))
         return g_list
+        '''
+        # the new parallel extraction code
+        start = time.time()
+        pool = mp.Pool(mp.cpu_count())
+        results = pool.map_async(parallel_worker, [((i, j), A, h, max_nodes_per_hop, node_information) for i, j in zip(links[0], links[1])])
+        remaining = results._number_left
+        pbar = tqdm(total=remaining)
+        while True:
+            pbar.update(remaining - results._number_left)
+            if results.ready(): break
+            remaining = results._number_left
+            time.sleep(1)
+        results = results.get()
+        pool.close()
+        pbar.close()
+        g_list = [GNNGraph(g, g_label, n_labels, n_features) for g, n_labels, n_features in results]
+        max_n_label['value'] = max(max([max(n_labels) for _, n_labels, _ in results]), max_n_label['value'])
+        end = time.time()
+        print("Time eplased for subgraph extraction: {}s".format(end-start))
+        return g_list
+
     print('Enclosing subgraph extraction begins...')
     train_graphs = helper(A, train_pos, 1) + helper(A, train_neg, 0)
     test_graphs = helper(A, test_pos, 1) + helper(A, test_neg, 0)
     print(max_n_label)
     return train_graphs, test_graphs, max_n_label['value']
 
+def parallel_worker(x):
+    return subgraph_extraction_labeling(*x)
 
 def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_information=None):
     # extract the h-hop enclosing subgraph around link 'ind'
