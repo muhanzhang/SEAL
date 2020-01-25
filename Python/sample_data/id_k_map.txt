@@ -1,0 +1,6 @@
+0	3 dimensional
+1	3d
+2	3d animation
+3	3d display
+4	3d graphics
+5	3d ic
