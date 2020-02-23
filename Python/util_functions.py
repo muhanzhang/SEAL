@@ -19,6 +19,7 @@ sys.path.append('%s/software/node2vec/src' % cur_dir)
 from util import GNNGraph
 import node2vec
 import multiprocessing as mp
+from itertools import islice
 
 def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num=None):
     # get upper triangular matrix
@@ -74,10 +75,10 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
     # extract enclosing subgraphs
     max_n_label = {'value': 0}
     def helper(A, links, g_label):
-        '''
         g_list = []
         for i, j in tqdm(zip(links[0], links[1])):
-            g, n_labels, n_features = subgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
+            #g, n_labels, n_features = subgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
+            g, n_labels, n_features = pathgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
             max_n_label['value'] = max(max(n_labels), max_n_label['value'])
             g_list.append(GNNGraph(g, g_label, n_labels, n_features))
         return g_list
@@ -101,6 +102,7 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
         end = time.time()
         print("Time eplased for subgraph extraction: {}s".format(end-start))
         return g_list
+        '''
 
     print('Enclosing subgraph extraction begins...')
     train_graphs = helper(A, train_pos, 1) + helper(A, train_neg, 0)
@@ -109,7 +111,7 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
     return train_graphs, test_graphs, max_n_label['value']
 
 def parallel_worker(x):
-    return subgraph_extraction_labeling(*x)
+    return pathgraph_extraction_labeling(*x)
 
 def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_information=None):
     # extract the h-hop enclosing subgraph around link 'ind'
@@ -145,6 +147,65 @@ def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_infor
     # remove link between target nodes
     if g.has_edge(0, 1):
         g.remove_edge(0, 1)
+    return g, labels.tolist(), features
+
+
+def pathgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_information=None):
+    # extract the h-hop enclosing subgraph around link 'ind'
+    dist = 0
+    nodes = set([ind[0], ind[1]])
+    visited = set([ind[0], ind[1]])
+    fringe = set([ind[0], ind[1]])
+    nodes_dist = [0, 0]
+    for dist in range(1, h+1):
+        fringe = neighbors(fringe, A)
+        fringe = fringe - visited
+        visited = visited.union(fringe)
+        if max_nodes_per_hop is not None:
+            if max_nodes_per_hop < len(fringe):
+                fringe = random.sample(fringe, max_nodes_per_hop)
+        if len(fringe) == 0:
+            break
+        nodes = nodes.union(fringe)
+        nodes_dist += [dist] * len(fringe)
+    # move target nodes to top
+    nodes.remove(ind[0])
+    nodes.remove(ind[1])
+    nodes = [ind[0], ind[1]] + list(nodes) 
+    subgraph = A[nodes, :][:, nodes]
+    # apply node-labeling
+    labels = node_label(subgraph)
+    # get node features
+    features = None
+    if node_information is not None:
+        features = node_information[nodes]
+    # construct nx graph
+    g = nx.from_scipy_sparse_matrix(subgraph)
+    # remove link between target nodes
+    if g.has_edge(0, 1):
+        g.remove_edge(0, 1)
+
+    try:
+        paths = list(islice(nx.shortest_simple_paths(g, source=0, target=1), 10))
+    except nx.NetworkXNoPath:
+        return g, labels.tolist(), features
+    '''
+    unique_nodes = set()
+    for i in range(min(100, len(paths))):
+        try:
+            path = paths.next()
+            unique_nodes = unique_nodes.union(path)
+        except nx.NetworkXNoPath:
+            break
+    '''
+    unique_nodes = set(x for path in paths for x in path)
+    sorted_nodes = sorted(list(unique_nodes))
+    g = nx.Graph(g.subgraph(sorted_nodes))
+    labels = labels[sorted_nodes]
+    if node_information is not None:
+        features = features[sorted_nodes]
+    relabel_map = dict(zip(sorted_nodes, range(len(sorted_nodes))))
+    nx.relabel_nodes(g, relabel_map, copy=False)
     return g, labels.tolist(), features
 
 
