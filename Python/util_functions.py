@@ -3,8 +3,6 @@ import numpy as np
 import random
 from tqdm import tqdm
 import os, sys, pdb, math, time
-import cPickle as cp
-#import _pickle as cp  # python3 compatability
 import networkx as nx
 import argparse
 import scipy.io as sio
@@ -54,7 +52,7 @@ def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num
     return train_pos, train_neg, test_pos, test_neg
 
     
-def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_per_hop=None, node_information=None):
+def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_per_hop=None, node_information=None, num_paths=10):
     # automatically select h from {1, 2}
     if h == 'auto':
         # split train into val_train and val_test
@@ -78,7 +76,7 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
         g_list = []
         for i, j in tqdm(zip(links[0], links[1])):
             #g, n_labels, n_features = subgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
-            g, n_labels, n_features = pathgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
+            g, n_labels, n_features = pathgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information, num_paths)
             max_n_label['value'] = max(max(n_labels), max_n_label['value'])
             g_list.append(GNNGraph(g, g_label, n_labels, n_features))
         return g_list
@@ -150,7 +148,7 @@ def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_infor
     return g, labels.tolist(), features
 
 
-def pathgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_information=None):
+def pathgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_information=None, num_paths=10):
     # extract the h-hop enclosing subgraph around link 'ind'
     dist = 0
     nodes = set([ind[0], ind[1]])
@@ -186,7 +184,7 @@ def pathgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_info
         g.remove_edge(0, 1)
 
     try:
-        paths = list(islice(nx.shortest_simple_paths(g, source=0, target=1), 10))
+        paths = list(islice(nx.shortest_simple_paths(g, source=0, target=1), num_paths))
     except nx.NetworkXNoPath:
         return g, labels.tolist(), features
     '''
@@ -223,7 +221,7 @@ def node_label(subgraph):
     # an implementation of the proposed double-radius node labeling (DRNL)
     K = subgraph.shape[0]
     subgraph_wo0 = subgraph[1:, 1:]
-    subgraph_wo1 = subgraph[[0]+range(2, K), :][:, [0]+range(2, K)]
+    subgraph_wo1 = subgraph[[0]+list(range(2, K)), :][:, [0]+list(range(2, K))]
     dist_to_0 = ssp.csgraph.shortest_path(subgraph_wo0, directed=False, unweighted=True)
     dist_to_0 = dist_to_0[1:, 0]
     dist_to_1 = ssp.csgraph.shortest_path(subgraph_wo1, directed=False, unweighted=True)

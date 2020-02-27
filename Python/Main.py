@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import sys, copy, math, time, pdb
-import cPickle as pickle
+import pickle
 import scipy.io as sio
 import scipy.sparse as ssp
 import os.path
@@ -29,6 +29,8 @@ parser.add_argument('--test-ratio', type=float, default=0.1,
 parser.add_argument('--hop', default=1, metavar='S', 
                     help='enclosing subgraph hop number, \
                     options: 1, 2,..., "auto"')
+parser.add_argument('--num-paths', default=10, type=int, metavar='P', 
+                    help='number of paths between two target nodes to build the path subgraph')
 parser.add_argument('--max-nodes-per-hop', default=None, 
                     help='if > 0, upper bound the # nodes per hop by subsampling')
 parser.add_argument('--use-embedding', action='store_true', default=False,
@@ -59,7 +61,7 @@ if args.train_name is None:
     args.data_dir = os.path.join(args.file_dir, 'data/{}.mat'.format(args.data_name))
     data = sio.loadmat(args.data_dir)
     net = data['net']
-    if data.has_key('group'):
+    if 'group' in data:
         # load node attributes (here a.k.a. node classes)
         attributes = data['group'].toarray().astype('float32')
     else:
@@ -91,6 +93,7 @@ A[test_pos[0], test_pos[1]] = 0  # mask test links
 A[test_pos[1], test_pos[0]] = 0  # mask test links
 
 node_information = None
+# node_information = np.sum(A.toarray(), axis=1, keepdims=True)  # easily overfit power
 if args.use_embedding:
     embeddings = generate_node2vec_embeddings(A, 128, True, train_neg)
     node_information = embeddings
@@ -100,7 +103,7 @@ if args.use_attribute and attributes is not None:
     else:
         node_information = attributes
 
-train_graphs, test_graphs, max_n_label = links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, args.hop, args.max_nodes_per_hop, node_information)
+train_graphs, test_graphs, max_n_label = links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, args.hop, args.max_nodes_per_hop, node_information, args.num_paths)
 print('# train: %d, # test: %d' % (len(train_graphs), len(test_graphs)))
 
 # DGCNN configurations
