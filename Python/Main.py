@@ -25,6 +25,9 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--test-ratio', type=float, default=0.1,
                     help='ratio of test links')
+parser.add_argument('--no-parallel', action='store_true', default=False,
+                    help='if True, use single thread for subgraph extraction; \
+                    by default use all cpu cores to extract subgraphs in parallel')
 # model settings
 parser.add_argument('--hop', default=1, metavar='S', 
                     help='enclosing subgraph hop number, \
@@ -103,7 +106,7 @@ if args.use_attribute and attributes is not None:
     else:
         node_information = attributes
 
-train_graphs, test_graphs, max_n_label = links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, args.hop, args.max_nodes_per_hop, node_information, args.num_paths)
+train_graphs, test_graphs, max_n_label = links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, args.hop, args.max_nodes_per_hop, node_information, args.num_paths, args.no_parallel)
 print('# train: %d, # test: %d' % (len(train_graphs), len(test_graphs)))
 
 # DGCNN configurations
