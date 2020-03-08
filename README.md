@@ -17,7 +17,7 @@ SEAL is implemented in both MATLAB and Python. The MATLAB version was used to ge
 Note
 ----
 
-Neither embeddings nor attributes are necessary for SEAL. In most networks, SEAL can learn a very good model without using any embeddings or attributes (leveraging purely graph structures). As the experiments show, including embeddings in *X* might even hurt the performance. SEAL becomes an *inductive* link prediction model if we do not include node embeddings in *X*. 
+Neither embeddings nor attributes are necessary for SEAL. In most networks, SEAL can learn a very good model without using any embeddings or attributes (leveraging purely graph structures). As the experiments show, including embeddings in *X* might even hurt the performance. SEAL becomes an **inductive** link prediction model if we do not include node embeddings in *X*. 
 
 Reference
 ---------
