@@ -28,12 +28,15 @@ parser.add_argument('--test-ratio', type=float, default=0.1,
 parser.add_argument('--no-parallel', action='store_true', default=False,
                     help='if True, use single thread for subgraph extraction; \
                     by default use all cpu cores to extract subgraphs in parallel')
+parser.add_argument('--all-unknown-as-negative', action='store_true', default=False,
+                    help='if True, regard all unknown links as negative test data; \
+                    sample a portion from them as negative training data. Otherwise,\
+                    train negative and test negative data are both sampled from \
+                    unknown links without overlap.')
 # model settings
 parser.add_argument('--hop', default=1, metavar='S', 
                     help='enclosing subgraph hop number, \
                     options: 1, 2,..., "auto"')
-parser.add_argument('--num-paths', default=10, type=int, metavar='P', 
-                    help='number of paths between two target nodes to build the path subgraph')
 parser.add_argument('--max-nodes-per-hop', default=None, 
                     help='if > 0, upper bound the # nodes per hop by subsampling')
 parser.add_argument('--use-embedding', action='store_true', default=False,
@@ -87,7 +90,13 @@ else:
     #Sample negative train and test links
     train_pos = (train_idx[:, 0], train_idx[:, 1])
     test_pos = (test_idx[:, 0], test_idx[:, 1])
-    train_pos, train_neg, test_pos, test_neg = sample_neg(net, train_pos=train_pos, test_pos=test_pos, max_train_num=args.max_train_num)
+    train_pos, train_neg, test_pos, test_neg = sample_neg(
+        net, 
+        train_pos=train_pos, 
+        test_pos=test_pos, 
+        max_train_num=args.max_train_num,
+        all_unknown_as_negative=args.all_unknown_as_negative
+    )
 
 
 '''Train and apply classifier'''
@@ -106,7 +115,7 @@ if args.use_attribute and attributes is not None:
     else:
         node_information = attributes
 
-train_graphs, test_graphs, max_n_label = links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, args.hop, args.max_nodes_per_hop, node_information, args.num_paths, args.no_parallel)
+train_graphs, test_graphs, max_n_label = links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, args.hop, args.max_nodes_per_hop, node_information, args.no_parallel)
 print('# train: %d, # test: %d' % (len(train_graphs), len(test_graphs)))
 
 # DGCNN configurations

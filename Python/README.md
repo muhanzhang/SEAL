@@ -48,7 +48,7 @@ Sometimes even extracting 1-hop enclosing subgraphs for some links leads to unaf
 Requirements
 ------------
 
-Tested with Python 2.7, Pytorch 4.0, Scipy 1.0.0.
+Latest tested combination: Python 3.8.1 + Pytorch 1.4.0
 
 Required python libraries: gensim and scipy; all python libraries required by pytorch_DGCNN such as networkx, tqdm, sklearn etc.
 
