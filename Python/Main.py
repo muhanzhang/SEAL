@@ -103,6 +103,7 @@ else:
 A = net.copy()  # the observed network
 A[test_pos[0], test_pos[1]] = 0  # mask test links
 A[test_pos[1], test_pos[0]] = 0  # mask test links
+A.eliminate_zeros()  # make sure the links are masked when using the sparse matrix in scipy-1.3.x
 
 node_information = None
 # node_information = np.sum(A.toarray(), axis=1, keepdims=True)  # easily overfit power
