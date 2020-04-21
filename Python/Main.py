@@ -129,7 +129,7 @@ cmd_args.num_class = 2
 cmd_args.mode = 'gpu'
 cmd_args.num_epochs = 50
 cmd_args.learning_rate = 1e-4
-cmd_args.batch_size = 50
+cmd_args.batch_size = 1
 cmd_args.printAUC = True
 cmd_args.feat_dim = max_n_label + 1
 cmd_args.attr_dim = 0
@@ -152,7 +152,7 @@ best_loss = None
 for epoch in range(cmd_args.num_epochs):
     random.shuffle(train_idxes)
     classifier.train()
-    avg_loss = loop_dataset(train_graphs, classifier, train_idxes, optimizer=optimizer)
+    avg_loss = loop_dataset(train_graphs, classifier, train_idxes, optimizer=optimizer, cmd_args.batch_size)
     if not cmd_args.printAUC:
         avg_loss[2] = 0.0
     print('\033[92maverage training of epoch %d: loss %.5f acc %.5f auc %.5f\033[0m' % (epoch, avg_loss[0], avg_loss[1], avg_loss[2]))
