@@ -25,6 +25,12 @@ Usages
 Type "python Main.py" to have a try of SEAL on the USAir network.
 
 Type:
+    
+    python Main.py --data-name XXX --hop 'auto' --batch-size 1
+
+to reproduce the experimental results in Table 1 of the paper on dataset XXX. The default seed is 1. Append "--seed Y" to the above command to use other seeds.
+
+Type:
 
     python Main.py --data-name NS --test-ratio 0.5 --hop 'auto' --use-embedding
 
