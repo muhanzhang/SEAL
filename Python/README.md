@@ -50,6 +50,15 @@ to run SEAL on a custom splitting of train and test links, where each row of "PB
 
 Sometimes even extracting 1-hop enclosing subgraphs for some links leads to unaffordable number of nodes in the enclosing subgraphs, especially in Twitter-type networks where a hub node can have millions of followers. To deal with this case, append "--max-nodes-per-hop 100" for example to restrict the number of nodes in each hop to be less than 100 using random sampling. SEAL still shows excellent performance.
 
+If you want to use SEAL to output link existence probabilities for unknown links, first type
+
+    python Main.py --train-name PB_train.txt --test-name PB_val.txt --hop 1 --save-model
+
+where "PB_val.txt" is asssumed to be the held-out observed links to validating your model, and "--save-model" saves the final model to "data/PB_model.pth". Now, assume "PB_test.txt" is the pairs of nodes that you want to output link existence probabilities for (i.e., it may contain both positive and negative links). Type:
+    
+    python Main.py --train-name PB_train.txt --test-name PB_test.txt --hop 1 --only-predict
+
+to load the saved model and output predictions for "PB_test.txt" to "data/PB_test_pred.txt".
 
 Requirements
 ------------

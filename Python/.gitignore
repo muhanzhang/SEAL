@@ -2,3 +2,6 @@
 backup/
 *results.txt
 test_scores.txt
+*_pred.txt
+*.pkl
+*.pth

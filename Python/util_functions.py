@@ -19,7 +19,8 @@ import node2vec
 import multiprocessing as mp
 from itertools import islice
 
-def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num=None, all_unknown_as_negative=False):
+def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num=None,
+               all_unknown_as_negative=False):
     # get upper triangular matrix
     net_triu = ssp.triu(net, k=1)
     # sample positive links for train/test
@@ -66,7 +67,8 @@ def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num
     return train_pos, train_neg, test_pos, test_neg
 
     
-def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_per_hop=None, node_information=None, no_parallel=False):
+def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, 
+                    max_nodes_per_hop=None, node_information=None, no_parallel=False):
     # automatically select h from {1, 2}
     if h == 'auto':
         # split train into val_train and val_test
@@ -76,7 +78,8 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
         val_A[val_test_pos[1], val_test_pos[0]] = 0
         val_auc_CN = CN(val_A, val_test_pos, val_test_neg)
         val_auc_AA = AA(val_A, val_test_pos, val_test_neg)
-        print('\033[91mValidation AUC of AA is {}, CN is {}\033[0m'.format(val_auc_AA, val_auc_CN))
+        print('\033[91mValidation AUC of AA is {}, CN is {}\033[0m'.format(
+            val_auc_AA, val_auc_CN))
         if val_auc_AA >= val_auc_CN:
             h = 2
             print('\033[91mChoose h=2\033[0m')
@@ -90,7 +93,9 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
         g_list = []
         if no_parallel:
             for i, j in tqdm(zip(links[0], links[1])):
-                g, n_labels, n_features = subgraph_extraction_labeling((i, j), A, h, max_nodes_per_hop, node_information)
+                g, n_labels, n_features = subgraph_extraction_labeling(
+                    (i, j), A, h, max_nodes_per_hop, node_information
+                )
                 max_n_label['value'] = max(max(n_labels), max_n_label['value'])
                 g_list.append(GNNGraph(g, g_label, n_labels, n_features))
             return g_list
@@ -98,7 +103,10 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
             # the parallel extraction code
             start = time.time()
             pool = mp.Pool(mp.cpu_count())
-            results = pool.map_async(parallel_worker, [((i, j), A, h, max_nodes_per_hop, node_information) for i, j in zip(links[0], links[1])])
+            results = pool.map_async(
+                parallel_worker, 
+                [((i, j), A, h, max_nodes_per_hop, node_information) for i, j in zip(links[0], links[1])]
+            )
             remaining = results._number_left
             pbar = tqdm(total=remaining)
             while True:
@@ -110,21 +118,28 @@ def links2subgraphs(A, train_pos, train_neg, test_pos, test_neg, h=1, max_nodes_
             pool.close()
             pbar.close()
             g_list = [GNNGraph(g, g_label, n_labels, n_features) for g, n_labels, n_features in results]
-            max_n_label['value'] = max(max([max(n_labels) for _, n_labels, _ in results]), max_n_label['value'])
+            max_n_label['value'] = max(
+                max([max(n_labels) for _, n_labels, _ in results]), max_n_label['value']
+            )
             end = time.time()
             print("Time eplased for subgraph extraction: {}s".format(end-start))
             return g_list
 
     print('Enclosing subgraph extraction begins...')
-    train_graphs = helper(A, train_pos, 1) + helper(A, train_neg, 0)
-    test_graphs = helper(A, test_pos, 1) + helper(A, test_neg, 0)
-    print(max_n_label)
+    train_graphs, test_graphs = None, None
+    if train_pos and train_neg:
+        train_graphs = helper(A, train_pos, 1) + helper(A, train_neg, 0)
+    if test_pos and test_neg:
+        test_graphs = helper(A, test_pos, 1) + helper(A, test_neg, 0)
+    elif test_pos:
+        test_graphs = helper(A, test_pos, 1)
     return train_graphs, test_graphs, max_n_label['value']
 
 def parallel_worker(x):
     return subgraph_extraction_labeling(*x)
 
-def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None, node_information=None):
+def subgraph_extraction_labeling(ind, A, h=1, max_nodes_per_hop=None,
+                                 node_information=None):
     # extract the h-hop enclosing subgraph around link 'ind'
     dist = 0
     nodes = set([ind[0], ind[1]])
