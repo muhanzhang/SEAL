@@ -22,7 +22,7 @@ to install the required software and libraries. It will download and install the
 Usages
 ------
 
-Type "python Main.py" to have a try of SEAL on the USAir network.
+Type "python Main.py --data-name USAir" to have a try of SEAL on the USAir network.
 
 Type:
     
@@ -49,6 +49,12 @@ Type:
 to run SEAL on a custom splitting of train and test links, where each row of "PB_train.txt" is an observed training link, each row of "PB_test.txt" is an unobserved testing link. Note that links in "PB_train.txt" will be used to construct the observed network, yet it is not necessary to train SEAL on all links in "PB_train.txt" especially when the number of observed links is huge. To set a maximum number of links to train on, append "--max-train-num 10000" for example.
 
 Sometimes even extracting 1-hop enclosing subgraphs for some links leads to unaffordable number of nodes in the enclosing subgraphs, especially in Twitter-type networks where a hub node can have millions of followers. To deal with this case, append "--max-nodes-per-hop 100" for example to restrict the number of nodes in each hop to be less than 100 using random sampling. SEAL still shows excellent performance.
+
+Type:
+
+    python Main.py --data-name PB --train-name PB_train.txt --test-name PB_test.txt --hop 1
+
+to still use the positive train and test links in "PB_train.txt" and "PB_test.txt", but use the network contained in "PB.mat" (here "--use-attribute" can be used if there is a _group_ within "PB.mat").
 
 If you want to use SEAL to output link existence probabilities for unknown links, first type
 

@@ -15,7 +15,7 @@ from util_functions import *
 
 parser = argparse.ArgumentParser(description='Link Prediction with SEAL')
 # general settings
-parser.add_argument('--data-name', default='USAir', help='network name')
+parser.add_argument('--data-name', default=None, help='network name')
 parser.add_argument('--train-name', default=None, help='train name')
 parser.add_argument('--test-name', default=None, help='test name')
 parser.add_argument('--only-predict', action='store_true', default=False,
@@ -70,7 +70,19 @@ if args.max_nodes_per_hop is not None:
 '''Prepare data'''
 args.file_dir = os.path.dirname(os.path.realpath('__file__'))
 
-if args.train_name is None:
+# check whether train and test links are provided
+train_pos, test_pos = None, None
+if args.train_name is not None:
+    args.train_dir = os.path.join(args.file_dir, 'data/{}'.format(args.train_name))
+    train_idx = np.loadtxt(args.train_dir, dtype=int)
+    train_pos = (train_idx[:, 0], train_idx[:, 1])
+if args.test_name is not None:
+    args.test_dir = os.path.join(args.file_dir, 'data/{}'.format(args.test_name))
+    test_idx = np.loadtxt(args.test_dir, dtype=int)
+    test_pos = (test_idx[:, 0], test_idx[:, 1])
+
+# build observed network
+if args.data_name is not None:  # use .mat network
     args.data_dir = os.path.join(args.file_dir, 'data/{}.mat'.format(args.data_name))
     data = sio.loadmat(args.data_dir)
     net = data['net']
@@ -83,29 +95,30 @@ if args.train_name is None:
     if False:
         net_ = net.toarray()
         assert(np.allclose(net_, net_.T, atol=1e-8))
-    #Sample train and test links
-    train_pos, train_neg, test_pos, test_neg = sample_neg(
-        net, args.test_ratio, max_train_num=args.max_train_num
-    )
-else:
+else:  # build network from train links
+    assert (args.train_name is not None), "must provide train links if not using .mat"
     if args.train_name.endswith('_train.txt'):
         args.data_name = args.train_name[:-10] 
     else:
-        args.data_name = args.train_name
-    args.train_dir = os.path.join(args.file_dir, 'data/{}'.format(args.train_name))
-    args.test_dir = os.path.join(args.file_dir, 'data/{}'.format(args.test_name))
-    train_idx = np.loadtxt(args.train_dir, dtype=int)
-    test_idx = np.loadtxt(args.test_dir, dtype=int)
-    max_idx = max(np.max(train_idx), np.max(test_idx))
+        args.data_name = args.train_name.split('.')[0]
+    max_idx = np.max(train_idx)
+    if args.test_name is not None:
+        max_idx = max(max_idx, np.max(test_idx))
     net = ssp.csc_matrix(
         (np.ones(len(train_idx)), (train_idx[:, 0], train_idx[:, 1])), 
         shape=(max_idx+1, max_idx+1)
     )
     net[train_idx[:, 1], train_idx[:, 0]] = 1  # add symmetric edges
     net[np.arange(max_idx+1), np.arange(max_idx+1)] = 0  # remove self-loops
-    #Sample negative train and test links
-    train_pos = (train_idx[:, 0], train_idx[:, 1])
-    test_pos = (test_idx[:, 0], test_idx[:, 1])
+
+# sample train and test links
+if args.train_name is None and args.test_name is None:
+    # sample both positive and negative train/test links from net
+    train_pos, train_neg, test_pos, test_neg = sample_neg(
+        net, args.test_ratio, max_train_num=args.max_train_num
+    )
+else:
+    # use provided train/test positive links, sample negative from net
     train_pos, train_neg, test_pos, test_neg = sample_neg(
         net, 
         train_pos=train_pos, 
@@ -113,7 +126,6 @@ else:
         max_train_num=args.max_train_num,
         all_unknown_as_negative=args.all_unknown_as_negative
     )
-
 
 '''Train and apply classifier'''
 A = net.copy()  # the observed network

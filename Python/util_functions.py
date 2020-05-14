@@ -26,18 +26,19 @@ def sample_neg(net, test_ratio=0.1, train_pos=None, test_pos=None, max_train_num
     # sample positive links for train/test
     row, col, _ = ssp.find(net_triu)
     # sample positive links if not specified
-    if train_pos is None or test_pos is None:
+    if train_pos is None and test_pos is None:
         perm = random.sample(range(len(row)), len(row))
         row, col = row[perm], col[perm]
         split = int(math.ceil(len(row) * (1 - test_ratio)))
         train_pos = (row[:split], col[:split])
         test_pos = (row[split:], col[split:])
     # if max_train_num is set, randomly sample train links
-    if max_train_num is not None:
+    if max_train_num is not None and train_pos is not None:
         perm = np.random.permutation(len(train_pos[0]))[:max_train_num]
         train_pos = (train_pos[0][perm], train_pos[1][perm])
     # sample negative links for train/test
-    train_num, test_num = len(train_pos[0]), len(test_pos[0])
+    train_num = len(train_pos[0]) if train_pos else 0
+    test_num = len(test_pos[0]) if test_pos else 0
     neg = ([], [])
     n = net.shape[0]
     print('sampling negative links for train and test')
