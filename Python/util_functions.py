@@ -216,7 +216,7 @@ def generate_node2vec_embeddings(A, emd_size=128, negative_injection=False, trai
     G = node2vec.Graph(nx_G, is_directed=False, p=1, q=1)
     G.preprocess_transition_probs()
     walks = G.simulate_walks(num_walks=10, walk_length=80)
-    walks = [map(str, walk) for walk in walks]
+    walks = [list(map(str, walk)) for walk in walks]
     model = Word2Vec(walks, size=emd_size, window=10, min_count=0, sg=1, 
             workers=8, iter=1)
     wv = model.wv
