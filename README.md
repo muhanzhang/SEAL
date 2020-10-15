@@ -14,6 +14,8 @@ Version
 
 SEAL is implemented in both MATLAB and Python. The MATLAB version was used to generate the experimental results in the paper, which also contains the evaluation code of other baseline methods. The Python software has better flexibility and scalability.
 
+There is also a PyTorch Geometric implementation [here](https://github.com/rusty1s/pytorch_geometric/blob/master/examples/seal_link_pred.py), and an implementation for the open graph benchmark (OGB) datasets [here](https://github.com/facebookresearch/SEAL_OGB).
+
 Note
 ----
 
