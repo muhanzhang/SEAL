@@ -4,7 +4,7 @@ SEAL -- learning from Subgraphs, Embeddings, and Attributes for Link prediction
 About
 -----
 
-Code for SEAL (learning from Subgraphs, Embeddings, and Attributes for Link prediction). SEAL is a novel framework for link prediction which systematically transforms link prediction to a subgraph classification problem. For each target link, SEAL extracts its *h*-hop enclosing subgraph *A* and builds its node information matrix *X* (containing structural labels, latent embeddings, and explicit attributes of nodes). Then, SEAL feeds (*A, X*) into a graph neural network (GNN) to classify the link existence, so that it can learn from both graph structure features (from *A*) and latent/explicit features (from *X*) simultaneously for link prediction.
+Code for SEAL (learning from Subgraphs, Embeddings, and Attributes for Link prediction). SEAL is a novel framework for link prediction which systematically transforms link prediction to a subgraph classification problem. For each target link, SEAL extracts its *h*-hop enclosing subgraph *A* and builds its node information matrix *X* (containing structural node labels, latent embeddings, and explicit attributes of nodes). Then, SEAL feeds (*A, X*) into a graph neural network (GNN) to classify the link existence, so that it can learn from both graph structure features (from *A*) and latent/explicit features (from *X*) simultaneously for link prediction.
 
 For more information, please check our paper:
 > M. Zhang and Y. Chen, Link Prediction Based on Graph Neural Networks, Advances in Neural Information Processing Systems (NIPS-18). [\[PDF\]](https://arxiv.org/pdf/1802.09691.pdf)
@@ -14,12 +14,12 @@ Version
 
 SEAL is implemented in both MATLAB and Python. The MATLAB version was used to generate the experimental results in the paper, which also contains the evaluation code of other baseline methods. The Python software has better flexibility and scalability.
 
-There is also a PyTorch Geometric implementation [here](https://github.com/rusty1s/pytorch_geometric/blob/master/examples/seal_link_pred.py), and an implementation for the open graph benchmark (OGB) datasets [here](https://github.com/facebookresearch/SEAL_OGB).
+There is also a PyTorch Geometric implementation [here](https://github.com/facebookresearch/SEAL_OGB), which tests SEAL on the open graph benchmark (OGB) datasets. It also supports Planetoid datasets such as Cora and CiteSeer, as well as custom Pytorch Geometric datasets.
 
 Note
 ----
 
-Neither embeddings nor attributes are necessary for SEAL. In most networks, SEAL can learn a very good model without using any embeddings or attributes (leveraging purely graph structures). As the experiments show, including embeddings in *X* might even hurt the performance. SEAL becomes an **inductive** link prediction model if we do not include node embeddings in *X*. 
+Neither embeddings nor attributes are necessary for SEAL. In most networks, SEAL can learn a very good model without using any embeddings or attributes (thus leveraging purely graph structures). As the experiments show, including embeddings in *X* might even hurt the performance. SEAL becomes an **inductive** link prediction model if we do not include node embeddings in *X*. 
 
 Reference
 ---------
